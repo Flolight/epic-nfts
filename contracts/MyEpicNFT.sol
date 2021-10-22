@@ -16,6 +16,7 @@ contract MyEpicNFT is ERC721URIStorage {
 
     string baseSVG = "<svg xmlns='http://www.w3.org/2000/svg' preserveAspectRatio='xMinYMin meet' viewBox='0 0 350 350'><style>.base { fill: white; font-family: serif; font-size: 34px; }</style><rect width='100%' height='100%' fill='#7CC6FE'/><text x='50%' y='30%' class='base' dominant-baseline='middle' text-anchor='middle'>Ceci n'est pas un NFT,</text><text x='50%' y='55%' class='base' dominant-baseline='middle' text-anchor='middle'> c'est ";
     string[] randomWords = ["une fourchette", "une crevette", "une planette", "une carte", "une brouette", "une invention", "une coccinelle", "un ballon", "un minigolf", "un panier", "un entonnoir", "un rongeur", "un mirage", "un parachute"];
+    event NewEpicNFTMinted(address sender, uint256 tokenId);
 
     constructor() ERC721 ("NonNFT-NFT", "NNFT") {
         console.log("This is my awesome NFT Contract. Isn't that great?!!");
@@ -30,11 +31,14 @@ contract MyEpicNFT is ERC721URIStorage {
     function random(string memory input) internal pure returns (uint256) {
         return uint256(keccak256(abi.encodePacked(input)));
     }
-
+    function getTotalNFTsMintedSoFar() public view returns (uint256) {
+        return _tokenIds.current();
+    }
     function makeAnEpicNFT() public {
 
         uint256 newItemId = _tokenIds.current();
 
+        require(newItemId <= 50);
         string memory word = pickRandomWord(newItemId);
 
         string memory finalSVG = string(abi.encodePacked(baseSVG, word, " !</text></svg>"));
@@ -64,5 +68,7 @@ contract MyEpicNFT is ERC721URIStorage {
         console.log("An NFT with ID %d has been minted to %s", newItemId, msg.sender);
 
         _tokenIds.increment();
+
+        emit NewEpicNFTMinted(msg.sender, newItemId);
     }
 }
